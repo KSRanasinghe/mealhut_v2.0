@@ -1,0 +1,257 @@
+/* GOOGLE FONTS */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+input[type=text], [type=password], [type=number], [type=email] {
+  font-size: 14px;
+}
+
+/* SETUP */
+:root {
+  /* Color Styles */
+  --primary: #198754;
+  --grey: #e3e3e8;
+
+  /* Font Sizes */
+  --mh-h1: 101px;
+  --mh-h2: 76px;
+  --mh-h3: 57px;
+  --mh-h4: 43px;
+
+  --mh-p1: 20px;
+  --mh-p2: 24px;
+  --mh-p3: 32px;
+
+  /* Font Weights */
+  --mh-fw-b: 700;
+  --mh-fw-sb: 600;
+  --mh-fw-m: 500;
+  --mh-fw-r: 400;
+}
+
+/* PreLoader Customization */
+.spinner-wrapper{
+  background-color: var(--grey);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 600ms;
+}
+
+div.spinner-border.text-success{
+  height: 5rem;
+  width: 5rem;
+}
+
+.fade-out {
+  animation: fadeOut 600ms ease-out;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/*NavBar Customizations*/
+
+.navbar-brand {
+  font-size: var(--mh-p3);
+  font-weight: var(--mh-fw-b);
+}
+
+@media only screen and (min-width: 992px) {
+  .dropdown-center:hover .dropdown-menu {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 991.98px) {
+  form .dropdown-center .dropdown-toggle {
+    padding-left: initial;
+  }
+}
+
+/* Carosel Customizations */
+.bg-img-1 {
+  background-image: url("../images/app/slide1.jpeg");
+}
+
+.bg-img-2 {
+  background-image: url("../images/app/slide2.jpeg");
+}
+
+.bg-img-3 {
+  background-image: url("../images/app/slide3.jpeg");
+}
+
+.carousel-img {
+  height: 85vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.carousel-caption {
+  bottom: 10rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.caption-1 {
+  text-align: center;
+}
+
+.caption-2 {
+  text-align: left;
+}
+
+.caption-3 {
+  text-align: right;
+}
+
+.carousel-caption h5 {
+  font-size: var(--mh-h3);
+  font-weight: var(--mh-fw-sb);
+}
+
+.carousel-caption p {
+  font-size: var(--mh-p1);
+}
+
+/* applies to x-small devices (portrait phones, less than 576px) */
+@media only screen and (max-width: 575.98px) {
+  .carousel-caption {
+    bottom: 8rem !important;
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+  }
+
+  .carousel-caption h5 {
+    font-size: var(--mh-p3);
+    font-weight: var(--mh-fw-sb);
+  }
+
+  .carousel-caption p {
+    font-size: 1rem !important;
+  }
+}
+
+/* applies to medium devices (tablets, less than 992px) */
+@media only screen and (max-width: 991.98px) {
+  .carousel-caption {
+    bottom: 15rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media only screen and (min-width: 1400px) {
+  .carousel-caption {
+    bottom: 18rem;
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+
+  .carousel-caption h5 {
+    font-size: var(--mh-h2);
+    font-weight: var(--mh-fw-sb);
+  }
+
+  .carousel-caption p {
+    font-size: var(--mh-p2);
+  }
+}
+
+/* POPULAR SECTION */
+section.popular-section {
+  padding: 6rem 0;
+}
+
+.card-box {
+  padding: 2rem 0;
+}
+
+/* Graphite Backgroung Theme */
+.graphite-theme {
+  background: url("../images/app/graphite.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+/* SIGN IN PAGE */
+section.signin-section {
+  padding: 6rem 0;
+}
+
+.title-box {
+  padding: 1rem 0 0 0;
+}
+
+/* TERMS PAGE */
+section.terms-section {
+  padding: 6rem 0;
+}
+
+/* PRIVACY PAGE */
+section.privacy-section {
+  padding: 6rem 0;
+}
+
+/* ABOUT PAGE */
+section.about-section {
+  padding: 6rem 0;
+}
+
+/* CONTACT PAGE */
+section.contact-section {
+  padding: 6rem 0;
+}
+
+/* SIGN UP PAGE */
+section.signup-section {
+  padding: 6rem 0;
+}
+
+/* OEDER DETAILS PAGE */
+section.details-section {
+  padding: 6rem 0;
+}
+
+/* MEAL FEATURE PAGE */
+section.meal-feature-section{
+  padding: 6rem 0 2rem 0;
+}
+
+section.related-items-section{
+  padding: 2rem 0 6rem 0;
+}
+
+/* CART PAGE */
+.quantity{
+  padding-top: 0.5rem;
+}
+
+/* CHECKOUT DETAILS PAGE */
+.img-fluid.payment-method{
+  height: 8.5rem;
+}
