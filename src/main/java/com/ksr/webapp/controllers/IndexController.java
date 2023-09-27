@@ -24,12 +24,6 @@ public class IndexController {
     }
 
     @GET
-    @Path("/cart")
-    public Viewable cart(){
-        return new Viewable("/frontend/cart");
-    }
-
-    @GET
     @Path("/terms")
     public Viewable terms(){
         return new Viewable("/frontend/terms");

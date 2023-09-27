@@ -12,5 +12,6 @@
 
     <!--    DB tables mapping-->
     <mapping class="com.ksr.webapp.entity.User"/>
+    <mapping class="com.ksr.webapp.entity.UserProfile"/>
   </session-factory>
 </hibernate-configuration>

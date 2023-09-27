@@ -1,7 +1,9 @@
 package com.ksr.webapp.services;
 
 import com.ksr.webapp.dto.AuthDTO;
+import com.ksr.webapp.dto.UserProfileDTO;
 import com.ksr.webapp.entity.User;
+import com.ksr.webapp.entity.UserProfile;
 import com.ksr.webapp.util.Encryption;
 import com.ksr.webapp.util.HibernateUtil;
 import jakarta.persistence.NoResultException;
@@ -72,6 +74,53 @@ public class UserService {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            session.close();
+        }
+    }
+
+    public UserProfile getByUserId(Long id){
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            return session.createQuery("FROM UserProfile up WHERE up.userId = :id", UserProfile.class).setParameter("id", id).uniqueResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public boolean update(UserProfileDTO userProfileDTO) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            UserProfile existUserProfile = session.createQuery("FROM UserProfile up WHERE up.userId = :uid", UserProfile.class)
+                    .setParameter("uid", userProfileDTO.getUid()).uniqueResult();
+
+            if (existUserProfile != null) {
+                existUserProfile.setFirstName(userProfileDTO.getFirstName());
+                existUserProfile.setLastName(userProfileDTO.getLastName());
+                existUserProfile.setPhone(userProfileDTO.getPhone());
+
+                session.update(existUserProfile);
+            } else {
+                UserProfile userProfile = new UserProfile();
+                userProfile.setFirstName(userProfileDTO.getFirstName());
+                userProfile.setLastName(userProfileDTO.getLastName());
+                userProfile.setPhone(userProfileDTO.getPhone());
+                userProfile.setUserId(userProfileDTO.getUid());
+
+                session.persist(userProfile);
+            }
+
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            return false;
         } finally {
             session.close();
         }

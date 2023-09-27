@@ -3,6 +3,7 @@ package com.ksr.webapp.controllers;
 import com.ksr.webapp.dto.AuthDTO;
 import com.ksr.webapp.entity.User;
 import com.ksr.webapp.services.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
@@ -17,13 +18,19 @@ public class SigninController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response signin(AuthDTO authDTO, @Context HttpServletRequest request) {
+    public Response signin(AuthDTO authDTO, @Context HttpServletRequest request, @Context HttpServletResponse response) {
 
         UserService userService = new UserService();
 
         User user = userService.signin(authDTO);
 
         if (user != null) {
+            if (authDTO.isCookie()) {
+                Cookie emailCookie = new Cookie("email", user.getEmail());
+                emailCookie.setMaxAge(3600);
+                response.addCookie(emailCookie);
+            }
+
             request.getSession().setAttribute("user", user);
             return Response.ok().entity("success").build();
         } else {

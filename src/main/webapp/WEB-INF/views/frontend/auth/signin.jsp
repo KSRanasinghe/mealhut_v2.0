@@ -27,7 +27,7 @@
                                                             class="text-danger">*</span></label>
                                                     <input type="text" class="form-control shadow-none"
                                                            placeholder="example@gmail.com" id="email"
-                                                           autocomplete="on"/>
+                                                           autocomplete="on" value="${empty cookie.email ? '' : cookie.email.value}"/>
                                                 </div>
                                                 <div class="col-12">
                                                     <label class="form-label text-black fs-6">Password <span
@@ -38,8 +38,8 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input shadow-none" type="checkbox"
                                                            value="1"
-                                                           id="remember">
-                                                    <label class="form-check-label text-black fs-6" for="remember">
+                                                           id="cookie">
+                                                    <label class="form-check-label text-black fs-6" for="cookie">
                                                         Remember Me
                                                     </label>
                                                 </div>
@@ -94,7 +94,7 @@
 
                 let email = document.getElementById(`email`).value;
                 let password = document.getElementById(`password`).value;
-                let remember = document.getElementById(`remember`).checked;
+                let cookie = document.getElementById(`cookie`).checked;
                 let btn = document.querySelector(`.signin-btn`);
 
 
@@ -113,6 +113,7 @@
                         body: JSON.stringify({
                             email: email,
                             password: password,
+                            cookie: cookie,
                         })
                     })
                         .then((response) => {

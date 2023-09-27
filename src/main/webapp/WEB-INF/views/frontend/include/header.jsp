@@ -45,7 +45,7 @@
                         <a href="${BASE_URL}auth/signin" class="btn btn-outline-success rounded-pill me-2">Sign In /
                             Register
                         </a>
-                        <a href="${BASE_URL}cart" class="btn btn-outline-success rounded-pill disabled">
+                        <a href="${BASE_URL}profile/cart" class="btn btn-outline-success rounded-pill disabled">
                             <i class="bi bi-cart3"></i>
                         </a>
                     </c:if>
@@ -65,7 +65,7 @@
                                 <li><a class="dropdown-item" href="#">Logout</a></li>
                             </ul>
                         </div>
-                        <a href="${BASE_URL}cart" class="btn btn-outline-success rounded-pill">
+                        <a href="${BASE_URL}profile/cart" class="btn btn-outline-success rounded-pill">
                             <i class="bi bi-cart3"></i>
                         </a>
                     </c:if>
