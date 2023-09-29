@@ -17,7 +17,7 @@ public class RegisterController {
     public Response register(AuthDTO authDTO) {
 
         UserService userService = new UserService();
-        User byEmail = userService.getByEmail(authDTO.getEmail());
+        User byEmail = userService.getUserByEmail(authDTO.getEmail());
 
         if (byEmail != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("exist").build();

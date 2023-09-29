@@ -13,5 +13,6 @@
     <!--    DB tables mapping-->
     <mapping class="com.ksr.webapp.entity.User"/>
     <mapping class="com.ksr.webapp.entity.UserProfile"/>
+    <mapping class="com.ksr.webapp.entity.BillingAddress"/>
   </session-factory>
 </hibernate-configuration>

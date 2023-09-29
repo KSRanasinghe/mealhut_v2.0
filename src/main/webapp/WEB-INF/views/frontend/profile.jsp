@@ -22,12 +22,14 @@
                                     <div class="col-lg-6">
                                         <label class="form-label text-black fs-6">
                                             First Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control shadow-none mb-3" required id="fname" value="${empty profile.firstName ? '' : profile.firstName}"/>
+                                        <input type="text" class="form-control shadow-none mb-3" required id="fname"
+                                               value="${empty profile.firstName ? '' : profile.firstName}"/>
                                     </div>
                                     <div class="col-lg-6">
                                         <label class="form-label text-black fs-6">
                                             Last Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control shadow-none mb-3" required id="lname" value="${empty profile.lastName ? '' : profile.lastName}"/>
+                                        <input type="text" class="form-control shadow-none mb-3" required id="lname"
+                                               value="${empty profile.lastName ? '' : profile.lastName}"/>
                                     </div>
                                     <div class="col-lg-6">
                                         <label class="form-label text-black fs-6">
@@ -75,18 +77,21 @@
                                                 <label class="form-label text-black fs-6">
                                                     Address Line 1 <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control shadow-none mb-3" required
-                                                       id="address_1"/>
+                                                       id="line_1"
+                                                       value="${empty address.lineOne ? '' : address.lineOne}"/>
                                                 <label class="form-label text-black fs-6">
                                                     Address Line 2 <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control shadow-none mb-3" required
-                                                       id="address_2"/>
+                                                       id="line_2"
+                                                       value="${empty address.lineTwo ? '' : address.lineTwo}"/>
                                                 <div class="row">
                                                     <div class="col-lg-8">
                                                         <label class="form-label text-black fs-6">
                                                             Nearest City <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control shadow-none mb-3"
                                                                required
-                                                               id="city"/>
+                                                               id="city"
+                                                               value="${empty address.city ? '' : address.city}"/>
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <label class="form-label text-black fs-6">
@@ -96,8 +101,7 @@
                                                     </div>
                                                 </div>
                                                 <button class="btn btn-outline-success rounded-pill shadow-none save_2">
-                                                    Save
-                                                    Changes
+                                                    Save Changes
                                                 </button>
                                             </div>
                                         </div>
@@ -150,6 +154,7 @@
 
     <layout:put block="script" type="APPEND">
         <script type="text/javascript">
+            /*Profile Update*/
             document.querySelector(`.save_1`).addEventListener(`click`, (e) => {
                 const phoneRegex = /^07[0,1,2,4,5,6,7,8]{1}[0-9]{7}$/;
 
@@ -191,6 +196,117 @@
                                 window.alert(`Something went wrong.`);
                             }
                             window.location.reload();
+                        })
+                        .catch((error) => {
+                            console.error(`Error in profile.jsp :`, error);
+                        })
+                }
+            });
+
+            /*Address Update*/
+            document.querySelector(`.save_2`).addEventListener(`click`, (e) => {
+
+                let profileId = ${empty profile.id ? 0 : profile.id};
+                let lineOne = document.querySelector(`#line_1`);
+                let lineTwo = document.querySelector(`#line_2`);
+                let city = document.querySelector(`#city`);
+                let save_2 = document.querySelector(`.save_2`);
+
+                if (lineOne.value == `` || lineTwo.value == `` || city.value == ``) {
+                    window.alert(`Please fill mandatory fields.`);
+                } else if (lineOne.value.length > 150) {
+                    window.alert(`Address line 1 is too long.`)
+                } else if (lineTwo.value.length > 150) {
+                    window.alert(`Address line 2 is too long.`)
+                } else if (city.value.length > 20) {
+                    window.alert(`City name is too long.`)
+                } else {
+                    lineOne.readOnly = true;
+                    lineTwo.readOnly = true;
+                    city.readOnly = true;
+                    save_2.disabled = true;
+
+                    fetch('${BASE_URL}profile/address', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            lineOne: lineOne.value,
+                            lineTwo: lineTwo.value,
+                            city: city.value,
+                            profileId: profileId,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                window.alert(`Your billing address has been updated.`);
+                            } else if (value == `undefined`) {
+                                window.alert(`Please update your account details first.`);
+                            } else {
+                                window.alert(`Something went wrong.`);
+                            }
+                            window.location.reload();
+                        })
+                        .catch((error) => {
+                            console.error(`Error in profile.jsp :`, error);
+                        })
+                }
+            });
+
+            /*Password Change*/
+            document.querySelector(`.save_3`).addEventListener(`click`, (e) => {
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@_])[A-Za-z\d$@_]{8,}$/;
+
+                let uid = ${sessionScope.user.id};
+                let currentPassword = document.querySelector(`#current_pswd`);
+                let passwordOne = document.querySelector(`#password_1`);
+                let passwordTwo = document.querySelector(`#password_2`);
+                let save_3 = document.querySelector(`.save_3`);
+
+                if (currentPassword.value == `` || passwordOne.value == `` || passwordTwo.value == ``) {
+                    window.alert(`Please fill mandatory fields.`);
+                } else if (!passwordRegex.test(passwordOne.value)) {
+                    window.alert(`Please enter a valid password.`)
+                } else if (passwordOne.value != passwordTwo.value) {
+                    window.alert(`Please check if your confirm password is correct.`)
+                } else {
+                    currentPassword.readOnly = true;
+                    passwordOne.readOnly = true;
+                    passwordTwo.readOnly = true;
+                    save_3.disabled = true;
+
+                    fetch('${BASE_URL}profile/password-change', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            currentPassword: currentPassword.value,
+                            passwordNew: passwordOne.value,
+                            uid: uid,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                window.alert(`Your password has been changed successfully.`);
+                                window.location.reload();
+                            } else if (value == `invalid`) {
+                                window.alert(`Current password is invalid`);
+                                currentPassword.readOnly = false;
+                                passwordOne.readOnly = false;
+                                passwordTwo.readOnly = false;
+                                save_3.disabled = false;
+                            } else {
+                                window.alert(`Something went wrong.`);
+                                window.location.reload();
+                            }
                         })
                         .catch((error) => {
                             console.error(`Error in profile.jsp :`, error);

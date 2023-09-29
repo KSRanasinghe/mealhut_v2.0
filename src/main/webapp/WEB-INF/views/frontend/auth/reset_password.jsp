@@ -33,10 +33,13 @@
                                         <div>
                                             <label class="form-label text-black fs-6">Your Email <span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" class="form-control me-auto shadow-none" required />
+                                            <input type="text" class="form-control me-auto shadow-none" required
+                                                   id="email"/>
                                         </div>
                                         <div>
-                                            <button class="btn btn-outline-success rounded-pill shadow-none btn-otp">Get OTP</button>
+                                            <button class="btn btn-outline-success rounded-pill shadow-none btn-otp">Get
+                                                OTP
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -49,13 +52,13 @@
                                         <div>
                                             <label class="form-label text-black fs-6">OTP <span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" class="form-control me-auto shadow-none" required />
+                                            <input type="text" class="form-control me-auto shadow-none" required/>
                                         </div>
                                         <div>
                                             <button type="button"
-                                                    class="btn btn-outline-success rounded-pill shadow-none me-2 btn-confirm">Confirm</button>
-                                            <button type="button"
-                                                    class="btn btn-outline-danger rounded-pill shadow-none btn-re-enter">Re-enter</button>
+                                                    class="btn btn-outline-success rounded-pill shadow-none me-2 btn-confirm">
+                                                Confirm
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -68,22 +71,26 @@
                                         <div class="col-md-6">
                                             <label class="form-label text-black fs-6">New Password <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" class="form-control me-auto shadow-none" required />
+                                            <input type="password" class="form-control me-auto shadow-none" required/>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-black fs-6">Confirm Password <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" class="form-control me-auto shadow-none" required />
+                                            <input type="password" class="form-control me-auto shadow-none" required/>
                                         </div>
                                         <div>
                                             <small class="text-muted">
-                                                Your password must be 8-20 characters long, contain at least one uppercase,one
-                                                lowercase, one number and one symbol (like $@_), and must not contain spaces or emoji.
+                                                Your password must be 8-20 characters long, contain at least one
+                                                uppercase,one
+                                                lowercase, one number and one symbol (like $@_), and must not contain
+                                                spaces or emoji.
                                             </small>
                                         </div>
                                         <div>
                                             <button type="button"
-                                                    class="btn btn-outline-success rounded-pill shadow-none me-2 btn-save">Save</button>
+                                                    class="btn btn-outline-success rounded-pill shadow-none me-2 btn-save">
+                                                Save
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -98,12 +105,56 @@
 
     <layout:put block="script" type="APPEND">
         <script type="text/javascript">
+            /*Prevent reload*/
+            window.addEventListener(`beforeunload`, (e) => {
+                e.preventDefault();
+                e.returnValue = `Your unsaved change will be discarded after refresh. Are you sure you want continue?`;
+            });
+
+            /*Get OTP*/
             document.querySelector(`.btn-otp`).addEventListener(`click`, (e) => {
                 let col_email = document.querySelector(`#col-email`);
                 let col_otp = document.querySelector(`#col-otp`);
 
-                col_email.classList.toggle("d-none");
-                col_otp.classList.toggle("d-none");
+                const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+
+                let email = document.querySelector(`#email`);
+                let btn_otp = document.querySelector(`.btn-otp`);
+
+                if (email.value == ``) {
+                    window.alert(`Please enter your email.`);
+                } else if (!emailRegex.test(email.value)) {
+                    window.alert(`Please enter a valid email.`)
+                } else {
+                    email.readOnly = true;
+                    btn_otp.disabled = true;
+
+                    fetch('${BASE_URL}auth/reset', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: email.value,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                window.alert(`OTP has been sent to your email.`)
+                                col_email.classList.toggle("d-none");
+                                col_otp.classList.toggle("d-none");
+                            } else {
+                                window.alert(`Sorry! we can't find your account.`)
+                                window.location.reload();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`Error in reset_password.jsp :`, error);
+                        })
+                }
             });
 
             // Show col-email
