@@ -152,6 +152,32 @@ public class UserService {
         }
     }
 
+    public boolean confirmOtp(String email, String otp) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            Query<User> query = session.createQuery("FROM User u WHERE u.email = :email AND u.otp = :otp", User.class);
+            query.setParameter("email", email);
+            query.setParameter("otp", otp);
+            User user = query.uniqueResult();
+
+            if (user != null) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
     public boolean address(BillingAddressDTO billingAddressDTO) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = null;
@@ -227,6 +253,29 @@ public class UserService {
             }
             e.printStackTrace();
             return "fail";
+        } finally {
+            session.close();
+        }
+    }
+
+    public boolean resetPassword(Long id, String password) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            User user = session.createQuery("FROM User u WHERE u.id = :id", User.class).setParameter("id", id).uniqueResult();
+            user.setPassword(Encryption.encryption(password));
+            session.update(user);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
         } finally {
             session.close();
         }

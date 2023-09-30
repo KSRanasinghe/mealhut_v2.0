@@ -1,8 +1,10 @@
 package com.ksr.webapp.controllers;
 
 import com.ksr.webapp.dto.AuthDTO;
+import com.ksr.webapp.dto.PasswordChangeDTO;
 import com.ksr.webapp.entity.User;
 import com.ksr.webapp.entity.UserProfile;
+import com.ksr.webapp.mail.ConfirmPasswordReset;
 import com.ksr.webapp.mail.ForgotPasswordEmail;
 import com.ksr.webapp.provider.MailServiceProvider;
 import com.ksr.webapp.services.UserService;
@@ -84,12 +86,12 @@ public class AuthController {
     @POST
     @Path("/auth/reset")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response resetPassword(AuthDTO authDTO) {
+    public Response resetPassword(AuthDTO authDTO, @Context HttpServletRequest request) {
         UserService userService = new UserService();
-        User userByEmail = userService.getUserByEmail(authDTO.getEmail());
+        User user = userService.getUserByEmail(authDTO.getEmail());
 
-        if (userByEmail != null) {
-            UserProfile userProfile = userService.getUserProfileByUserId(userByEmail.getId());
+        if (user != null) {
+            UserProfile userProfile = userService.getUserProfileByUserId(user.getId());
 
             if (userProfile != null) {
                 String to = authDTO.getEmail();
@@ -102,11 +104,50 @@ public class AuthController {
                 boolean updateOtp = userService.updateOtp(to, otp);
 
                 if (updateOtp) {
+                    request.getSession().setAttribute("forgot_user", user);
                     return Response.ok().entity("success").build();
                 }
             }
         }
 
+        return Response.status(Response.Status.BAD_REQUEST).entity("fail").build();
+    }
+
+    @POST
+    @Path("/auth/reset/confirm-otp")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response confirmOtp(PasswordChangeDTO passwordChangeDTO, @Context HttpServletRequest request) {
+        User forgotUser = (User) request.getSession(false).getAttribute("forgot_user");
+        if (forgotUser != null) {
+            UserService userService = new UserService();
+            boolean confirm = userService.confirmOtp(forgotUser.getEmail(), passwordChangeDTO.getOtp());
+            if (confirm) {
+                return Response.ok().entity("success").build();
+            }
+        }
+
+        return Response.status(Response.Status.BAD_REQUEST).entity("fail").build();
+    }
+
+    @POST
+    @Path("/auth/reset/password-change")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response passwordChange(PasswordChangeDTO passwordChangeDTO, @Context HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            User forgotUser = (User) session.getAttribute("forgot_user");
+            if (forgotUser != null) {
+                UserService userService = new UserService();
+                boolean reset = userService.resetPassword(forgotUser.getId(), passwordChangeDTO.getPasswordNew());
+                if (reset) {
+                    ConfirmPasswordReset mail = new ConfirmPasswordReset(forgotUser.getEmail());
+                    MailServiceProvider.getInstance().sendMail(mail);
+                    session.removeAttribute("forgot_user");
+                    session.invalidate();
+                    return Response.ok().entity("success").build();
+                }
+            }
+        }
         return Response.status(Response.Status.BAD_REQUEST).entity("fail").build();
     }
 

@@ -5,6 +5,7 @@ public class PasswordChangeDTO {
     private String currentPassword;
     private String passwordNew;
     private Long uid;
+    private String otp;
 
     public String getCurrentPassword() {
         return currentPassword;
@@ -28,5 +29,13 @@ public class PasswordChangeDTO {
 
     public void setUid(Long uid) {
         this.uid = uid;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 }

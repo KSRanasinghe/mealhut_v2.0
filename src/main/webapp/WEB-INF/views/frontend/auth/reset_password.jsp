@@ -52,7 +52,8 @@
                                         <div>
                                             <label class="form-label text-black fs-6">OTP <span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" class="form-control me-auto shadow-none" required/>
+                                            <input type="text" class="form-control me-auto shadow-none" id="otp"
+                                                   required/>
                                         </div>
                                         <div>
                                             <button type="button"
@@ -71,12 +72,12 @@
                                         <div class="col-md-6">
                                             <label class="form-label text-black fs-6">New Password <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" class="form-control me-auto shadow-none" required/>
+                                            <input type="password" class="form-control me-auto shadow-none" id="password_1" required/>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-black fs-6">Confirm Password <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" class="form-control me-auto shadow-none" required/>
+                                            <input type="password" class="form-control me-auto shadow-none" id="password_2" required/>
                                         </div>
                                         <div>
                                             <small class="text-muted">
@@ -105,12 +106,6 @@
 
     <layout:put block="script" type="APPEND">
         <script type="text/javascript">
-            /*Prevent reload*/
-            window.addEventListener(`beforeunload`, (e) => {
-                e.preventDefault();
-                e.returnValue = `Your unsaved change will be discarded after refresh. Are you sure you want continue?`;
-            });
-
             /*Get OTP*/
             document.querySelector(`.btn-otp`).addEventListener(`click`, (e) => {
                 let col_email = document.querySelector(`#col-email`);
@@ -143,7 +138,7 @@
                         })
                         .then((value) => {
                             if (value == `success`) {
-                                window.alert(`OTP has been sent to your email.`)
+                                window.alert(`OTP has been sent to your email.`);
                                 col_email.classList.toggle("d-none");
                                 col_otp.classList.toggle("d-none");
                             } else {
@@ -157,22 +152,92 @@
                 }
             });
 
-            // Show col-email
-            document.querySelector(`.btn-re-enter`).addEventListener(`click`, (e) => {
-                let col_otp = document.querySelector(`#col-otp`);
-                let col_email = document.querySelector(`#col-email`);
-
-                col_otp.classList.toggle("d-none");
-                col_email.classList.toggle("d-none");
-            });
-
-            // Show col-password
+            /*Confirm OTP*/
             document.querySelector(`.btn-confirm`).addEventListener(`click`, (e) => {
                 let col_otp = document.querySelector(`#col-otp`);
                 let col_password = document.querySelector(`#col-password`);
 
-                col_otp.classList.toggle("d-none");
-                col_password.classList.toggle("d-none");
+                let otp = document.querySelector(`#otp`);
+                let btn_confirm = document.querySelector(`.btn-confirm`);
+
+                if (otp.value == ``) {
+                    window.alert(`Please enter your OTP.`);
+                } else {
+                    otp.readOnly = true;
+                    btn_confirm.disabled = true;
+
+                    fetch('${BASE_URL}auth/reset/confirm-otp', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            otp: otp.value,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                col_otp.classList.toggle("d-none");
+                                col_password.classList.toggle("d-none");
+                            } else {
+                                window.alert(`Invalid OTP. Please try again.`)
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`Error in reset_password.jsp :`, error);
+                        })
+                }
+            });
+
+            /*Reset password*/
+            document.querySelector(`.btn-save`).addEventListener(`click`, (e) => {
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@_])[A-Za-z\d$@_]{8,}$/;
+
+                let passwordOne = document.querySelector(`#password_1`);
+                let passwordTwo = document.querySelector(`#password_2`);
+                let btn_save = document.querySelector(`.btn-save`);
+
+                if (passwordOne.value == `` || passwordTwo.value == ``) {
+                    window.alert(`Please fill mandatory fields.`);
+                } else if (!passwordRegex.test(passwordOne.value)) {
+                    window.alert(`Please enter a valid password.`)
+                } else if (passwordOne.value != passwordTwo.value) {
+                    window.alert(`Please check if your confirm password is correct.`)
+                } else {
+                    passwordOne.readOnly = true;
+                    passwordTwo.readOnly = true;
+                    btn_save.disabled = true;
+
+                    fetch('${BASE_URL}auth/reset/password-change', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            passwordNew: passwordOne.value,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                window.alert(`Your password has been changed successfully.`);
+                                window.location = ${BASE_URL}+"auth/signin";
+                            } else {
+                                window.alert(`Something went wrong.`);
+                                passwordOne.readOnly = false;
+                                passwordTwo.readOnly = false;
+                                btn_save.disabled = false;
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`Error in profile.jsp :`, error);
+                        })
+                }
             });
         </script>
     </layout:put>
