@@ -1,6 +1,7 @@
 <%@ page import="com.ksr.webapp.entity.AdminType" %>
 <%@ taglib uri="http://callidora.lk/jsp/template-inheritance" prefix="layout" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <layout:extends name="admin_base">
 
@@ -37,29 +38,44 @@
                                                 <thead>
                                                 <tr>
                                                     <th>Username</th>
-                                                    <th>Admin Name</th>
+                                                    <th>Admin Type</th>
                                                     <th>Assigned On</th>
                                                     <th>Status</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr class="align-middle">
-                                                    <td><span class="font-monospace">kesharashakthi71@gmail.com</span>
-                                                    </td>
-                                                    <td><span class="text-capitalize">keshara ranasinghe</span></td>
-                                                    <td><span>2023-08-25</span></td>
-                                                    <td>
-                                                        <div class="d-flex justify-content-center align-items-center">
-                                                            <span
-                                                                    class="badge text-bg-success text-uppercase">active</span>
-                                                            <!-- <span class="badge text-bg-danger">inactive</span> -->
-                                                            <button
-                                                                    class="btn btn-outline-danger rounded-pill shadow-none ms-2 change">
-                                                                <i class="bi bi-arrow-repeat"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                <c:if test="${not empty admins}">
+                                                    <c:forEach items="${admins}" var="admins">
+                                                        <tr class="align-middle">
+                                                            <td>
+                                                                <span class="font-monospace">${admins.email}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-capitalize">${admins.adminType}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>${admins.createdAt}</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex justify-content-center align-items-center">
+                                                                    <c:set var="status" value="${admins.status}"/>
+                                                                    <c:choose>
+                                                                        <c:when test="${status}">
+                                                                            <span class="badge text-bg-success text-uppercase">active</span>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <span class="badge text-bg-danger text-uppercase">inactive</span>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                    <button class="btn btn-outline-danger rounded-pill shadow-none ms-2"
+                                                                            onclick="changeStatus(`${admins.email}`)">
+                                                                        <i class="bi bi-arrow-repeat"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:if>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -115,34 +131,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- static backdrop modal -->
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-             aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Item ID: <span class="ms-1">001</span>
-                        </h1>
-                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" class="form-control shadow-none" min="0" required/>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control shadow-none" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-success rounded-pill shadow-none">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </layout:put>
 
     <layout:put block="script" type="APPEND">
@@ -171,6 +159,7 @@
             });
         </script>
         <script type="text/javascript">
+            /*Save new admin*/
             document.querySelector(`.btn-save`).addEventListener(`click`, (e) => {
                 const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
                 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@_])[A-Za-z\d$@_]{8,}$/;
@@ -239,6 +228,35 @@
                         })
                 }
             });
+
+            /*Change status*/
+            function changeStatus(adminEmail) {
+                let email = adminEmail;
+
+                fetch('${BASE_URL}admin/administration/status', {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                    })
+                })
+                    .then((response) => {
+                        return response.text();
+                    })
+                    .then((value) => {
+                        if (value == `success`) {
+                            window.alert(`Admin status has been changed successfully.`);
+                        } else {
+                            window.alert(`Something went wrong.`);
+                        }
+                        window.location.reload();
+                    })
+                    .catch((error) => {
+                        console.error(`Error in administration.jsp :`, error);
+                    })
+            }
         </script>
     </layout:put>
 </layout:extends>

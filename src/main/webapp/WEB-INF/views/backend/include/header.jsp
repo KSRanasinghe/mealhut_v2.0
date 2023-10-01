@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <section class="nav-section">
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid d-flex justify-content-start">
@@ -52,14 +53,16 @@
                                 Feedbacks
                             </a>
                         </li>
+                        <c:if test="${not empty sessionScope.admin and sessionScope.admin.adminType eq 'ADMIN'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${BASE_URL}admin/administration">
+                                    <span class="fs-5 me-2"><i class="bi bi-person-gear"></i></span>
+                                    Administration
+                                </a>
+                            </li>
+                        </c:if>
                         <li class="nav-item">
-                            <a class="nav-link" href="${BASE_URL}admin/administration">
-                                <span class="fs-5 me-2"><i class="bi bi-person-gear"></i></span>
-                                Administration
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="#">
+                            <a class="nav-link text-danger" href="${BASE_URL}admin/sign-out">
                                 <span class="fs-5 me-2"><i class="bi bi-box-arrow-right"></i></span>
                                 Sign Out
                             </a>

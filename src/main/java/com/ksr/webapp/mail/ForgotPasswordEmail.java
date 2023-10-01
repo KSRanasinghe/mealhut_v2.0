@@ -29,7 +29,7 @@ public class ForgotPasswordEmail extends Mailable {
                 .text("Welcome, " + name).h1().center().and()
                 .text("Your MealHut password reset code is,").center().and()
                 .text(otp).h3().bold().center().and()
-                .text("If you do not want to change your password or did not request this, please ignore & delete this message.").italic().center().and()
+                .text("If you do not want to change your password or did not request this, please ignore this message.").italic().center().and()
                 .text("Thank You!").center().and()
                 .copyright("MealHut Sri Lanka").url("http://localhost:8080/mealhut").suffix(". All rights reserved.")
                 .build();

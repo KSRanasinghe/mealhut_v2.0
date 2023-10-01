@@ -1,4 +1,5 @@
 <%@ taglib uri="http://callidora.lk/jsp/template-inheritance" prefix="layout" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <layout:extends name="admin_base">
 
@@ -38,33 +39,62 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr class="align-middle">
-                                                <td>1</td>
-                                                <td class="text-capitalize">kottu</td>
-                                                <td class="text-uppercase">
-                                                    <div class="d-flex justify-content-center align-items-center">
-                                                        <span class="badge text-bg-success">active</span>
-                                                        <!-- <span class="badge text-bg-danger">inactive</span> -->
-                                                        <button
-                                                                class="btn btn-outline-danger rounded-pill shadow-none ms-2">
-                                                            <i class="bi bi-arrow-repeat"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-center align-items-center">
-                                                        <button type="button" tabindex="0" data-bs-toggle="modal"
-                                                                data-bs-target="#staticBackdrop"
-                                                                class="btn btn-outline-light shadow-none rounded-pill">
-                                                                <span class="text-secondary">
-                                                                    <i class="bi bi-pen"></i>
-                                                                    <span class="d-none d-md-inline ms-md-2">Edit
-                                                                        Category</span>
-                                                                </span>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                            <c:if test="${not empty categories}">
+                                                <c:forEach items="${categories}" var="categories">
+                                                    <tr class="align-middle">
+                                                        <td>${categories.id}</td>
+                                                        <td class="text-capitalize">${categories.categoryName}</td>
+                                                        <td class="text-uppercase">
+                                                            <div class="d-flex justify-content-center align-items-center">
+                                                                <c:set var="status" value="${categories.status}"/>
+                                                                <c:choose>
+                                                                    <c:when test="${status}">
+                                                                        <span class="badge text-bg-success text-uppercase">active</span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge text-bg-danger text-uppercase">inactive</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                                <button
+                                                                        class="btn btn-outline-danger rounded-pill shadow-none ms-2">
+                                                                    <i class="bi bi-arrow-repeat"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-center align-items-center">
+                                                                <c:set var="status" value="${categories.status}"/>
+                                                                <c:choose>
+                                                                    <c:when test="${status}">
+                                                                        <button type="button" tabindex="0"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#staticBackdrop"
+                                                                                class="btn btn-outline-light shadow-none rounded-pill">
+                                                                                    <span class="text-secondary">
+                                                                                        <i class="bi bi-pen"></i>
+                                                                                        <span class="d-none d-md-inline ms-md-2">Edit
+                                                                                            Category</span>
+                                                                                    </span>
+                                                                        </button>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <button type="button" tabindex="0"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#staticBackdrop"
+                                                                                class="btn btn-outline-light shadow-none rounded-pill disabled">
+                                                                                    <span class="text-secondary">
+                                                                                        <i class="bi bi-pen"></i>
+                                                                                        <span class="d-none d-md-inline ms-md-2">Edit
+                                                                                            Category</span>
+                                                                                    </span>
+                                                                        </button>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:if>
                                             </tbody>
                                         </table>
                                     </div>
@@ -78,9 +108,11 @@
                                     <div class="card-body">
                                         <div class="mb-3">
                                             <label class="form-label">Category Name</label>
-                                            <input type="text" class="form-control shadow-none" required/>
+                                            <input type="text" class="form-control shadow-none" id="category_name"
+                                                   required/>
                                         </div>
-                                        <button class="btn btn-outline-success rounded-pill shadow-none">Save</button>
+                                        <button class="btn btn-outline-success rounded-pill shadow-none save-btn">Save
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -129,10 +161,52 @@
                     ordering: false,
                     pageLength: 15,
                     columnDefs: [{
-                        targets: [2,3],
+                        targets: [2, 3],
                         searchable: false
                     }]
                 });
+            });
+        </script>
+        <script type="text/javascript">
+            document.querySelector(`.save-btn`).addEventListener(`click`, (e) => {
+                let category_name = document.querySelector(`#category_name`);
+                let save_btn = document.querySelector(`.save-btn`);
+
+                if (category_name.value == ``) {
+                    window.alert(`Please fill mandatory fields.`);
+                } else {
+                    category_name.readOnly = true;
+                    save_btn.disabled = true;
+
+                    fetch('${BASE_URL}admin/category/save', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: category_name.value,
+                        })
+                    })
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((value) => {
+                            if (value == `success`) {
+                                window.alert(`New category has been added successfully.`)
+                                window.location.reload();
+                            } else if (value == `exist`) {
+                                window.alert(`This category already exists.`);
+                                category_name.readOnly = false;
+                                save_btn.disabled = false;
+                            } else {
+                                window.alert(`Something went wrong.`);
+                                window.location.reload();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`Error in categories.jsp of backend :`, error);
+                        })
+                }
             });
         </script>
     </layout:put>

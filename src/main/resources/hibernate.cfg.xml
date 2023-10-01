@@ -15,5 +15,7 @@
     <mapping class="com.ksr.webapp.entity.UserProfile"/>
     <mapping class="com.ksr.webapp.entity.BillingAddress"/>
     <mapping class="com.ksr.webapp.entity.Admin"/>
+    <mapping class="com.ksr.webapp.entity.Category"/>
+    <mapping class="com.ksr.webapp.entity.Item"/>
   </session-factory>
 </hibernate-configuration>

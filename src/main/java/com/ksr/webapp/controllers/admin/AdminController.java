@@ -30,4 +30,17 @@ public class AdminController {
             return Response.status(Response.Status.BAD_REQUEST).entity("fail").build();
         }
     }
+
+    @POST
+    @Path("/administration/status")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response changeStatus(AdminDTO adminDTO) {
+        AdminService adminService = new AdminService();
+        boolean changeStatus = adminService.changeStatus(adminDTO);
+
+        if (changeStatus) {
+            return Response.ok().entity("success").build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity("fail").build();
+    }
 }
